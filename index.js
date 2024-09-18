@@ -1,30 +1,28 @@
 import http from 'node:http';
 import url from 'node:url';
-import fs from 'node:fs';
+import path from 'node:path';
+import express from 'express';
 
-const page404 = fs.readFileSync('./404.html', 'utf-8', (err, data) => {
-  if (err) throw err;
-  return data;
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+
+app.get(['/', '/index'], (req, res) => {
+  res.sendFile(path.join(__dirname, '/index.html'));
 });
 
-const server = http.createServer((req, res) => {
-  const q = url.parse(req.url, true);
-  let filename;
-  if (q.pathname === '/') {
-    filename = './index.html';
-  } else {
-    filename = '.' + q.pathname + '.html';
-  }
-  fs.readFile(filename, (err, data) => {
-    if (err) {
-      res.writeHead(404, { 'Content-Type': 'text/html' });
-      res.write(page404);
-      return res.end();
-    }
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.write(data);
-    return res.end();
-  });
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, '/about.html'));
 });
 
-server.listen(8080);
+app.get('/contact-me', (req, res) => {
+  res.sendFile(path.join(__dirname, '/contact-me.html'));
+});
+
+// The 404 Route (ALWAYS keep this as the last route)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, './404.html'));
+});
+
+app.listen(3000);
