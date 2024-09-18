@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.get(['/', '/index'], (req, res) => {
+app.get('/(index)?', (req, res) => {
   res.sendFile(path.join(__dirname, '/index.html'));
 });
 
